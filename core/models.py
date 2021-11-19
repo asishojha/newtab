@@ -44,11 +44,8 @@ class Subject(models.Model):
 	sub_n = models.CharField(max_length=4)
 	compulsory = models.CharField(max_length=1)
 
-	class Meta:
-		unique_together = (('student', 'sub', 'sub_n'), )
-
 	def __str__(self):
-		return self.sub + ' ' + self.sub_n
+		return self.sub
 
 class Mark(models.Model):
 	student = models.ForeignKey(Student, on_delete=models.CASCADE)
