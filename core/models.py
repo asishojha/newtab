@@ -45,7 +45,7 @@ class Subject(models.Model):
 	compulsory = models.CharField(max_length=1)
 
 	def __str__(self):
-		return self.sub
+		return self.student.roll_no + ' - ' + self.subject_code
 
 class Mark(models.Model):
 	student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -61,7 +61,7 @@ class Mark(models.Model):
 		unique_together = (('student', 'subject'), )
 
 	def __str__(self):
-		return self.student.roll_no + ' - ' + self.subject.sub_n
+		return self.student.roll_no + ' - ' + self.subject.subject_code
 
 class Result(models.Model):
 	student = models.OneToOneField(Student, on_delete=models.CASCADE, unique=True)

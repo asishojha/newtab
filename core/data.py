@@ -1,5 +1,5 @@
 import csv
-from .models import Student, School, Subject, Mark
+from .models import *
 
 
 def load_data():
@@ -45,7 +45,7 @@ def load_data():
 					sub_n = l[(9*i) + 2],
 					compulsory = l[(9*i) + 9],
 				)
-				mark = Mark.objects.get_or_create(
+				mark, marks_created = Mark.objects.get_or_create(
 					student=student,
 					subject=subject,
 					tth = l[(9*i) + 3],
@@ -55,6 +55,8 @@ def load_data():
 					total_sub = l[(9*i) + 7],
 					grade_sub = l[(9*i) + 8],
 				)
+
+			result, result_created = Result.objects.get_or_create(student=student)
 
 	return print('Data Load Complete')
 
