@@ -40,9 +40,9 @@ class Student(models.Model):
 class Subject(models.Model):
 	student = models.ForeignKey(Student, on_delete=models.CASCADE)
 	subject_code = models.CharField(max_length=1)
-	sub = models.CharField(max_length=2)
-	sub_n = models.CharField(max_length=4)
-	compulsory = models.CharField(max_length=1)
+	sub = models.CharField(max_length=2, null=True)
+	sub_n = models.CharField(max_length=4, null=True)
+	compulsory = models.CharField(max_length=1, null=True)
 
 	def __str__(self):
 		return self.student.roll_no + ' - ' + self.subject_code

@@ -64,11 +64,22 @@ def check_incomplete_students(request):
 def raw_results(request):
 	students = Student.objects.all()
 	appeared_student_count = students.exclude(result__ex_code__in = [1,2,3]).count()
+	passed_count=0
+	for student in students:
+		countx=0
+		for m in student.mark_set.all():
+	
+			if m.subject.sub:
+				if int(m.tth) >= int(PASSING_THEORY_MARKS[m.subject.sub]) :
+					countx+=1
+		if countx ==5 :
+			passed_count+=1
 
+	print('Passed Students: ',passed_count)
 	eligible_students = Student.objects.exclude(subject__sub='').count()
 	# eligible_students = Subject.objects.exclude(sub='').exclude(sub=None).values_list('student', flat=True).distinct()
-	print(eligible_students)
-
+	print('Appeared Students :',appeared_student_count)
+	#print(eligible_students)
 	# passed_count = 0
 
 	# for student in students:
