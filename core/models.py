@@ -1,5 +1,7 @@
 from django.db import models
 
+PASSING_THEORY_MARKS = {"01":"26",	"02":"26",	"03":"26",	"04":"26",	"05":"26",	"06":"26",	"11":"23",	"12":"23",	"13":"26",	"14":"23",	"15":"26",	"16":"23",	"17":"23",	"18":"23",	"19":"23",	"20":"23",	"21":"26",	"22":"26",	"23":"26",	"24":"26",	"25":"26",	"26":"26",	"27":"23",	"28":"15",	"29":"26",	"30":"26"}
+
 class School(models.Model):
 	index = models.CharField(max_length=5, null=True)
 
@@ -62,6 +64,12 @@ class Mark(models.Model):
 
 	def __str__(self):
 		return self.student.roll_no + ' - ' + self.subject.subject_code
+
+	@property
+	def is_passed_in_tth(self):
+		if self.tth != 'AB':
+			return int(self.tth) >= int(PASSING_THEORY_MARKS[self.subject.sub])
+		return False
 
 class Result(models.Model):
 	student = models.OneToOneField(Student, on_delete=models.CASCADE, unique=True)

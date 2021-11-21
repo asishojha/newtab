@@ -3,7 +3,8 @@ from .models import *
 
 
 def load_data():
-	file_name = input("Enter the name of the file (CASE-SENSITIVE) \n")
+	file_name = input("\nEnter the name of the file (CASE-SENSITIVE): \n")
+	compulsory_subject_count = input("\nEnter the number of compulsory subjects required: \n")
 
 	with open(file_name, 'r') as csv_file:
 		csv_reader = csv.reader(csv_file)
@@ -37,13 +38,19 @@ def load_data():
 				ind = l[102],
 				serial = l[103],
 			)
+			sub_count = 0
 			for i in range(1, 8):
+				if l[(9*i) + 1] and l[(9*i) + 1] != '' and sub_count <= int(compulsory_subject_count):
+					compulsory = 'c'
+					sub_count += 1
+				else:
+					compulsory = l[(9*i) + 9]
 				subject, subject_created = Subject.objects.get_or_create(
 					student = student,
 					subject_code = i,
 					sub = l[(9*i) + 1],
 					sub_n = l[(9*i) + 2],
-					compulsory = l[(9*i) + 9],
+					compulsory = compulsory,
 				)
 				mark, marks_created = Mark.objects.get_or_create(
 					student=student,
