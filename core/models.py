@@ -1,7 +1,5 @@
 from django.db import models
 
-PASSING_THEORY_MARKS = {"01":"26",	"02":"26",	"03":"26",	"04":"26",	"05":"26",	"06":"26",	"11":"23",	"12":"23",	"13":"26",	"14":"23",	"15":"26",	"16":"23",	"17":"23",	"18":"23",	"19":"23",	"20":"23",	"21":"26",	"22":"26",	"23":"26",	"24":"26",	"25":"26",	"26":"26",	"27":"23",	"28":"15",	"29":"26",	"30":"26"}
-
 class School(models.Model):
 	index = models.CharField(max_length=5, null=True)
 
@@ -9,13 +7,15 @@ class School(models.Model):
 		return self.index
 
 class Subject(models.Model):
-	subject_code = models.CharField(max_length=1)
 	sub = models.CharField(max_length=2, null=True)
 	sub_n = models.CharField(max_length=4, null=True)
-	# compulsory = models.CharField(max_length=1, null=True)
+	passing_th_marks = models.CharField(max_length=3)
+	passing_pr_marks = models.CharField(max_length=2, null=True)
+	max_th_marks = models.CharField(max_length=2, null=True)
+	max_pr_marks = models.CharField(max_length=2, null=True)
 
 	def __str__(self):
-		return self.subject_code
+		return self.sub
 
 class Student(models.Model):
 	school = models.ForeignKey(School, on_delete=models.CASCADE)
@@ -46,6 +46,7 @@ class Student(models.Model):
 	serial = models.CharField(max_length=6, null=True)
 	subjects = models.ManyToManyField(Subject, related_name='subjects')
 	compulsory_subjects = models.ManyToManyField(Subject, related_name='compulsory_subjects')
+	subject_codes = models.CharField(max_length=50)
 
 	def __str__(self):
 		return self.school.index + ' ' + self.name + '(' + self.roll_no + ')'
@@ -71,13 +72,6 @@ class Mark(models.Model):
 		if self.tth != 'AB':
 			return int(self.tth) >= int(PASSING_THEORY_MARKS[self.subject.sub])
 		return False
-
-class PassingMarkSchema(models.Model):
-	sub = models.CharField(max_length=1)
-	passing_marks = models.CharField(max_length=3)
-
-	def __str__(self):
-		return self.sub + ' - ' + self.passing_marks
 
 class Result(models.Model):
 	student = models.OneToOneField(Student, on_delete=models.CASCADE, unique=True)
