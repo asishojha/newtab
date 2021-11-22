@@ -69,3 +69,15 @@ def raw_results(request):
 	print('Stream Three Passed Students: ', stram3_passed_count)
 	print('Stream Three Appeared Students :', stream3_appeared_student_count)
 	return HttpResponse('Trial Going on')
+
+def sub_summary(request):
+
+	sbj_appeared = Subject.objects.values('sub').annotate(count = Count('sub'))
+	sbj_passed = 0
+
+	for mark in Mark.objects.all():
+		passing_marks = PASSING_THEORY_MARKS[mark.subject.sub]
+		sub_passed = Subject.objects.annotate(numpassed=Count(Case(When(mark__tth__gte=passing_marks, then=1), output_field=IntegerField(),)))
+	return sub_passed
+
+	# needs to be re designed

@@ -8,6 +8,15 @@ class School(models.Model):
 	def __str__(self):
 		return self.index
 
+class Subject(models.Model):
+	subject_code = models.CharField(max_length=1)
+	sub = models.CharField(max_length=2, null=True)
+	sub_n = models.CharField(max_length=4, null=True)
+	# compulsory = models.CharField(max_length=1, null=True)
+
+	def __str__(self):
+		return self.subject_code
+
 class Student(models.Model):
 	school = models.ForeignKey(School, on_delete=models.CASCADE)
 	name = models.CharField(max_length=35)
@@ -35,19 +44,11 @@ class Student(models.Model):
 	ind_2 = models.CharField(max_length=1, null=True)
 	ind = models.CharField(max_length=1, null=True)
 	serial = models.CharField(max_length=6, null=True)
+	subjects = models.ManyToManyField(Subject, related_name='subjects')
+	compulsory_subjects = models.ManyToManyField(Subject, related_name='compulsory_subjects')
 
 	def __str__(self):
 		return self.school.index + ' ' + self.name + '(' + self.roll_no + ')'
-
-class Subject(models.Model):
-	student = models.ForeignKey(Student, on_delete=models.CASCADE)
-	subject_code = models.CharField(max_length=1)
-	sub = models.CharField(max_length=2, null=True)
-	sub_n = models.CharField(max_length=4, null=True)
-	compulsory = models.CharField(max_length=1, null=True)
-
-	def __str__(self):
-		return self.student.roll_no + ' - ' + self.subject_code
 
 class Mark(models.Model):
 	student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -70,6 +71,13 @@ class Mark(models.Model):
 		if self.tth != 'AB':
 			return int(self.tth) >= int(PASSING_THEORY_MARKS[self.subject.sub])
 		return False
+
+class PassingMarkSchema(models.Model):
+	sub = models.CharField(max_length=1)
+	passing_marks = models.CharField(max_length=3)
+
+	def __str__(self):
+		return self.sub + ' - ' + self.passing_marks
 
 class Result(models.Model):
 	student = models.OneToOneField(Student, on_delete=models.CASCADE, unique=True)
