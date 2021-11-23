@@ -55,10 +55,10 @@ def load_data():
 					max_pr_marks = MAX_PRAC_MARKS[l[(9*i) + 1]]
 				)
 				student.subjects.add(subject)
-				if l[(9*i) + 1] and l[(9*i) + 1] != '' and sub_count <= int(compulsory_subject_count):
+				if l[(9*i) + 1] and sub_count < int(compulsory_subject_count):
 					student.compulsory_subjects.add(subject)
 					sub_count += 1
-				if l[(9*i) + 1] and l[(9*i) + 1] != '':
+				if l[(9*i) + 1]:
 					sub_codes.append(i)
 
 				mark, marks_created = Mark.objects.get_or_create(
@@ -71,6 +71,18 @@ def load_data():
 					total_sub = l[(9*i) + 7],
 					grade_sub = l[(9*i) + 8],
 				)
+				if mark.is_passed_in_tth:
+					mark.raw_passed = True
+					mark.save()
+
+				for sub in student.compulsory_subjects.all():
+					sub_mark = Mark.objects.get(student=student, subject=sub)
+					if sub_mark.raw_passed:
+						student.all_passed = True
+					else:
+						student.all_passed = False
+						break
+
 			student.subject_codes = ','.join(map(str, sub_codes))
 			student.save()
 

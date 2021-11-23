@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse #temporary
+from django.db.models import Count, Case, When, IntegerField
 from .models import *
 
 def index(request):
@@ -16,6 +17,7 @@ def check_absent_students(request):
 			student.result.ab_code = '5'
 		else:
 			student.result.ab_code = None
+		student.result.save()
 	return HttpResponse('Absent check Complete')
 
 def check_incomplete_students(request):
@@ -38,46 +40,30 @@ def raw_results(request):
 	stream3_appeared_students = appeared_students.filter(stream='3')
 	stream3_appeared_student_count = stream3_appeared_students.count()
 
-	passed_count = 0
-	stram1_passed_count = 0
-	stram2_passed_count = 0
-	stram3_passed_count = 0
-	
-	for student in appeared_students:
-		countx = 0
-		for m in student.mark_set.exclude(tth='AB').filter(subject__compulsory='c'):
-			if m.is_passed_in_tth:
-				countx += 1
-		if countx == 5 :
-			passed_count+=1
-			if student.stream == '1':
-				stram1_passed_count += 1
-			elif student.stream == '2':
-				stram2_passed_count += 1
-			elif student.stream == '3':
-				stram3_passed_count += 1
+	passed_count = appeared_students.filter(all_passed=True).count()
+	stream1_passed_count = appeared_students.filter(all_passed=True, stream='1').count()
+	stream2_passed_count = appeared_students.filter(all_passed=True, stream='2').count()
+	stream3_passed_count = appeared_students.filter(all_passed=True, stream='3').count()
 
-	print('Total Passed Students: ', passed_count)
+	print('Total Passed Students', passed_count)
 	print('Total Appeared Students :', appeared_student_count)
 
-	print('Stream One Passed Students: ', stram1_passed_count)
+	print('Stream One Passed Students: ', stream1_passed_count)
 	print('Stream One Appeared Students :', stream1_appeared_student_count)
 
-	print('Stream Two Passed Students: ', stram2_passed_count)
+	print('Stream Two Passed Students: ', stream2_passed_count)
 	print('Stream Two Appeared Students :', stream2_appeared_student_count)
 
-	print('Stream Three Passed Students: ', stram3_passed_count)
+	print('Stream Three Passed Students: ', stream3_passed_count)
 	print('Stream Three Appeared Students :', stream3_appeared_student_count)
 	return HttpResponse('Trial Going on')
 
 def sub_summary(request):
+	sbj_appeared = Mark.objects.values('subject__sub').annotate(appeared_count=Count('subject__sub'))
+	sbj_passed = Mark.objects.values('subject__sub').annotate(passed_count=Count(Case(When(raw_passed=True, then=1), output_field=IntegerField(),)))
 
-	# sbj_appeared = Subject.objects.values('sub').annotate(count = Count('sub'))
-	# sbj_passed = 0
+	print('sbj_appeared\n', sbj_appeared)
+	print('sbj_passed\n', sbj_passed)
 
-	# for mark in Mark.objects.all():
-	# 	sub_passed = Subject.objects.annotate(numpassed=Count(Case(When(mark__tth__gte=passing_marks, then=1), output_field=IntegerField(),)))
-	# return sub_passed
-	pass
+	return HttpResponse('Subject Summaries')
 
-	# needs to be re designed

@@ -47,6 +47,7 @@ class Student(models.Model):
 	subjects = models.ManyToManyField(Subject, related_name='subjects')
 	compulsory_subjects = models.ManyToManyField(Subject, related_name='compulsory_subjects')
 	subject_codes = models.CharField(max_length=50)
+	all_passed = models.BooleanField(null=True)
 
 	def __str__(self):
 		return self.school.index + ' ' + self.name + '(' + self.roll_no + ')'
@@ -60,17 +61,18 @@ class Mark(models.Model):
 	ppr_sub = models.CharField(max_length=2, null=True)
 	total_sub = models.CharField(max_length=3, null=True)
 	grade_sub = models.CharField(max_length=2, null=True)
+	raw_passed = models.BooleanField(null=True)
 
 	class Meta:
 		unique_together = (('student', 'subject'), )
 
 	def __str__(self):
-		return self.student.roll_no + ' - ' + self.subject.subject_code
+		return self.student.roll_no + ' - ' + self.subject.sub
 
 	@property
 	def is_passed_in_tth(self):
-		if self.tth != 'AB':
-			return int(self.tth) >= int(PASSING_THEORY_MARKS[self.subject.sub])
+		if self.tth != 'AB' and self.tth:
+			return int(self.tth) >= int(self.subject.passing_th_marks)
 		return False
 
 class Result(models.Model):
